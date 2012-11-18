@@ -1,0 +1,37 @@
+<div id="templatemo_wrapper">
+	<div id = "templatemo_signin">
+		<h1>Editing user</h1>
+		
+		<%= form_for(:user, :url => {:controller => "user", :action => "update", :id => @user.id }, :html => { :method => 'post' }) do |f| %>
+		  <% if @user.errors.any? %>
+			<div id="error_explanation">
+			  <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+		
+			  <ul>
+			  <% @user.errors.full_messages.each do |msg| %>
+				<li><%= msg %></li>
+			  <% end %>
+			  </ul>
+			</div>
+		  <% end %>
+		
+		  <p><%= f.label :username %><br />
+		  <%= f.text_field :username %></p>
+		
+		  <div><%= f.label :email %><br />
+		  <%= f.email_field :email %></div>
+		  
+		  <p><%= f.label :basedcountry %><br />
+		  <%= f.country_select :basedcountry %></p>
+		  
+		  <p><%= f.label :priority %><br />
+		  <%= f.select :priority, [['High','high'],['Low','low']] %></p>
+		  
+		  <div class="actions">
+			<%= f.submit %>
+		  </div>
+		<% end %>
+		
+		<%= link_to 'Back', manage_user_path %>
+	</div>
+</div>

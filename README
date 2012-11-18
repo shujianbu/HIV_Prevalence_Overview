@@ -1,0 +1,108 @@
+COMS 4156 Advanced Software Engineering 
+Team 1 - Network Fetcher 
+Project - HIV Prevalence Overview
+
+I Contact
+
+Tao Cheng tc2569@columbia.edu
+Pucong Han ph2369@columbia.edu
+Shujian Bu sb3331@columbia.edu
+Nanzhu Wang nw2260@columbia.edu
+
+II Introduction
+
+This is a N-tier web application based on Ruby on Rails that serves 
+to visualize the HIV prevalence and its coorelated factors. The 
+application is an interactive design based on Google Visualization 
+APIs and javascript libraries. Users are able to interact with a 
+Cholopleth Map page, a Line Chart page, a Bubble Chart page and a 
+customized perferrence page embedded in this system. Google News, 
+Google Youtube and Wikipedia APIs are also integrated. Users by 
+interacting with this application will be informed of the current 
+situations and trends of the global Hiv infection as well as impacts 
+of related indicators.
+
+III System Requirements
+
+*  Supported Operating Systems: GNU/Linux, Microsoft Windows 7 64-
+bit, Macintosh OS 64-bit
+*  Recommended Server: Rails v3.2.0
+*  Recommended Database: MongoDB v2.2.0 
+*  Recommended Browser: Google Chrome v23.0, Firefox v16.0.2 (Please
+make sure Javascript is enabled) NOTE: IE may not be supported
+currently
+
+IV Deployment for Testing Puropose
+
+*  Please ensure that 
+     Ruby,
+     Rails,
+     RubyGem,
+     MongoDB 
+   is successfully installed and configured.
+*  Unzip the project files to a local folder
+*  Setup database:
+     In a terminal, run "mongod"
+*  Open a terminal and cd into a project folder, run "bundle"
+   (bson_ext may fail in Windows cmd, please use MinGW instead)
+*  Initialize database:
+     run "rake db:seed"
+     (if failed, use "bundle update" instad in last step.)
+*  Open a new terminal, cd into project folder and run "rails server"
+*  Test: 
+     Open a new browser, input url "http://127.0.0.1:3000/"
+*  For testing an administrator account, please login with username: 
+"puconghan" and password: "administrator"
+*  For testing a user account, please login with username: "test2" 
+and password: "testtest"
+
+V Rails Components Being Used
+
+*  mongoid
+*  bson_ext
+*  country_select
+*  sundawg_country_codes
+*  devise
+*  sass-rails
+*  jquery-rails
+*  rspec-rails
+*  factory_girl_rails
+*  mongoid-rspec
+*  tlsmail
+*  i18n
+*  multi_json
+*  activesupport
+*  activemodel
+*  actionpack
+*  mail
+*  actionmailer
+*  actionrecord
+*  activeresource
+*  bson
+*  json
+*  orm_adapter
+*  warden
+
+VI Javascript Libraries / APIs Used
+
+*  jquery
+*  google javascript
+*  wikipedia api
+*  google news api
+*  youtube api
+*  twitter api
+
+VII Misc
+
+*  JIRA is used for project management. 
+*  STASH and GitHub is used as code repository. 
+*  The WorldBank (http://www.worldbank.org/) is used as our
+data source. It is possible that some countries may lack data
+in certain years, rendering that there may be blank areas or
+zero data points in our visualization charts.
+
+VIII Bug Report 
+
+Bug and missing feature patches are certainly welcome. Please 
+email hivdatafetcher@gmail.com if you have any questions or 
+comments. 

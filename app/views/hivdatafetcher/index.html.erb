@@ -1,0 +1,575 @@
+  <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+  <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+  
+  <script> $(function() { $( "#tabs" ).tabs(); }); </script>
+  <script> $(function() { $( "#selectable" ).selectable(); }); </script> 
+  <script>
+    var FACTOR = 'hiv';
+    var YEAR = 2005;
+    var COUNTRYSELECTED = "US";
+    var var_color_1 = 0xFFFFFF;
+    var var_color_2 = 0xF00000;
+    var var_color_3 = 0xFF0000;
+
+    var countryCode;
+    var listOfSelectedCountries = []; 
+
+    function createMap(){
+      jsonurl = 'http://127.0.0.1:3000/hivdatafetcher.json?year=' + YEAR + '&factor=' + FACTOR.toLowerCase();
+      $.getJSON(jsonurl , function(data)
+      {
+        var map = new google.visualization.DataTable();
+        map.addColumn('string', 'Country');
+        map.addColumn('number', FACTOR);
+        map.addColumn('string', 'Description');
+        $.each(data, function(i,v) 
+        {
+          map.addRow([v.name, parseFloat(v.value), v.displayname]);
+        });
+
+      var options = {};
+      options['colors'] = [var_color_1, var_color_2, var_color_3];
+      options['dataMode'] = 'regions';
+
+      var geomap = new google.visualization.GeoMap(document.getElementById('visualization'));
+      geomap.draw(map, options);
+
+      google.visualization.events.addListener(
+          geomap, 'regionClick', function(e) 
+          {
+            countryCode = e['region'];
+            wiki();
+            DrillDown();
+          });
+      });
+    }
+         
+    $(function() {
+        $( "#slider-vertical" ).slider(
+        {
+          orientation: "vertical",
+          range: "min",
+          min: 1960,
+          max: 2010,
+          value: 2005,
+          slide: function( event, ui ) {
+              $( "#amount" ).val( ui.value );
+          },
+          change: function(event, ui)
+          {
+            YEAR = $( "#slider-vertical" ).slider( "value" );
+            //alert(FACTOR+YEAR);
+            if(countryCode == null){
+              wiki();
+              createMap();
+            }
+            else{
+              wiki();
+              DrillDown();
+            }
+          }
+        });
+        $( "#amount" ).val( $( "#slider-vertical" ).slider( "value" ) );
+    });
+
+    function DrillDown(){
+      jsonurl = 'http://127.0.0.1:3000/hivdatafetcher.json?year=' + YEAR + '&factor=' + FACTOR.toLowerCase();
+      $.getJSON(jsonurl , function(data){
+        var map = new google.visualization.DataTable();
+        map.addColumn('string', 'Country');
+        map.addColumn('number', FACTOR);
+        map.addColumn('string', 'Description');
+        $.each(data, function(i,v) {
+          map.addRow([v.name, parseFloat(v.value), v.displayname]);
+        });
+        
+        var options = {};
+        options['colors'] = [var_color_1, var_color_2, var_color_3];
+        options['region'] = countryCode;
+        options['displayMode'] = 'markers';
+        options['showZoomOut'] = true;
+        var geomap = new google.visualization.GeoMap(document.getElementById('visualization'));
+        geomap.draw(map, options);
+
+        google.visualization.events.addListener(geomap, 'regionClick', function(e) {
+          countryCode = e['region'];
+          wiki();
+          DrillDown();                          
+        });
+        
+        google.visualization.events.addListener(geomap, 'zoomOut', function(e) {
+          countryCode = null;
+          wiki();
+          createMap();
+        });
+      });
+    }
+    
+    function myFunction(var1){
+      YEAR = $( "#slider-vertical" ).slider( "value" );   
+      FACTOR = var1;
+      document.getElementById("demo").innerHTML= FACTOR;
+      wiki();
+      createMap();
+
+      switch (FACTOR){
+        case 'HealthExpenditure':
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0x45FF1E;
+          var_color_3 = 0x1CA300;
+          break;
+        case 'GDP': 
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0x00F4E5;
+          var_color_3 = 0x00847C;
+          break;
+        case 'ImprovedWaterSource':
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0xFEFF70;
+          var_color_3 = 0xE0E000;
+          break;
+        case 'RuralPopulation': 
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0xFF28B8;
+          var_color_3 = 0xAD0074;
+          break;
+        case 'ImprovedSanitationFacilities':
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0xB53DFF;
+          var_color_3 = 0x520084;
+          break;
+        case 'LiteracyRate': 
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0xFFD851;
+          var_color_3 = 0xF4BE00;
+          break;
+        case 'UnemploymentRate':
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0x698CF6;
+          var_color_3 = 0x124AF1;
+          break;
+        default:
+          var_color_1 = 0xFFFFFF;
+          var_color_2 = 0xF00000;
+          var_color_3 = 0xFF0000;     
+      }
+    }
+
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(drawChart);
+    google.setOnLoadCallback(drawFavouriteChart);
+
+    $(function(){
+      wiki();
+      createMap();
+    });
+
+    function drawChart(){
+      var jsonData = $.ajax ( {
+        url: "http://127.0.0.1:3000/hivdatafetcher.json?country="+COUNTRYSELECTED ,
+        dataType: "json",
+        async: false 
+      }).responseText;       
+      
+      var data2 = new google.visualization.DataTable(jsonData);
+                        
+      var n_cols = data2.getNumberOfColumns();
+      var max_vals = new Array();
+      for (var i = 0; i < n_cols; i++)
+      {
+        max_vals[i] = data2.getColumnRange(i).max;
+      }
+
+      for (var i = 1 ; i < n_cols; i++)
+      {
+        data2.insertColumn(i*2, 'string', null);
+        data2.setColumnProperty(i*2, 'role', 'tooltip');
+      }
+
+      for (var i = 0; i < data2.getNumberOfRows(); i++)
+      {
+        for (var j = 1; j < n_cols; j++)
+        {
+          data2.setCell(i,j*2,data2.getColumnLabel(j*2-1) + ': ' + data2.getValue(i,j*2-1).toString() + ' ' + ' in ' + data2.getValue(i, 0));
+          data2.setCell(i,j*2-1,data2.getValue(i,j*2-1) / max_vals[j]);
+        }
+      }
+                     
+      var options = {
+          title: 'All Factor Visualizations for: ' + COUNTRYSELECTED,
+          width: 700,
+          height: 360
+      };    
+      var linechart = new google.visualization.LineChart(document.getElementById('vis_country'));
+      linechart.draw(data2, options);
+    }
+
+    function drawFavouriteChart(){
+        $.getJSON('http://127.0.0.1:3000/hivdatafetcher.json', function(data) {
+          baseCountryFull = "<%= current_user.basedcountry %>";
+          for(var i=0; i<data.length; i++){
+            if(data[i]["displayname"] == baseCountryFull){
+              baseCountryShort = data[i]["name"];
+              var jsonData = $.ajax ( {
+                url: "http://127.0.0.1:3000/hivdatafetcher.json?country="+baseCountryShort ,
+                dataType: "json",
+                async: false 
+              }).responseText;       
+      
+              var data2 = new google.visualization.DataTable(jsonData);
+                        
+              var n_cols = data2.getNumberOfColumns();
+              var max_vals = new Array();
+              for (var i = 0; i < n_cols; i++)
+              {
+                max_vals[i] = data2.getColumnRange(i).max;
+              }
+
+              for (var i = 1 ; i < n_cols; i++)
+              {
+                data2.insertColumn(i*2, 'string', null);
+                data2.setColumnProperty(i*2, 'role', 'tooltip');
+              }
+
+              for (var i = 0; i < data2.getNumberOfRows(); i++)
+              {
+                for (var j = 1; j < n_cols; j++)
+                {
+                  data2.setCell(i,j*2,data2.getColumnLabel(j*2-1) + ': ' + data2.getValue(i,j*2-1).toString() + ' ' + ' in ' + data2.getValue(i, 0));
+                  data2.setCell(i,j*2-1,data2.getValue(i,j*2-1) / max_vals[j]);
+                }
+              }
+                     
+              var options = {
+                  title: 'All Factor Visualizations for <%= current_user.basedcountry %>',
+                  width: 700,
+                  height: 360
+              };    
+              var linechart = new google.visualization.LineChart(document.getElementById('vis_fav_country'));
+              linechart.draw(data2, options);
+
+              break;
+            }
+          }
+        });
+    }
+    
+    google.load('visualization', '1', {packages: ['geomap']});
+    google.load('search', '1');
+  
+    $(function(){
+      wiki();
+      createMap();
+    });
+
+    var newsSearch;
+    function searchComplete() {
+      if (newsSearch.results && newsSearch.results.length > 0) {
+        for (var i = 0; i < newsSearch.results.length; i++) {
+          var tr = document.createElement('tr');
+          
+          var p = document.createElement('p');
+          var a = document.createElement('a');
+          a.href= newsSearch.results[i].unescapedUrl;
+          a.innerHTML = newsSearch.results[i].title;
+          p.appendChild(a);
+          tr.appendChild(p);
+          
+          if(newsSearch.results[i].image != undefined){
+            var divOut = document.createElement('div');
+            divOut.setAttribute('class', 'fr_img');
+            var div = document.createElement('div');
+            div.setAttribute('class', 'image_wrapper');
+            var aimg = document.createElement('a');
+            aimg.href = newsSearch.results[i].unescapedUrl;
+            var img = document.createElement('img');
+            img.src = newsSearch.results[i].image.url;
+            img.border = 0;
+            img.width = 30;
+            img.height = 30;
+            aimg.appendChild(img);
+            div.appendChild(aimg);
+            divOut.appendChild(div);
+            p.appendChild(divOut);
+          }
+          $('#googleNews_content').append(tr);
+        }
+      }
+    }
+
+    function onLoad() {
+      newsSearch = new google.search.NewsSearch();
+      newsSearch.setSearchCompleteCallback(this, searchComplete, null);
+      newsSearch.execute('HIV AIDS');
+      google.search.Search.getBranding('branding');
+    }
+
+    google.setOnLoadCallback(onLoad);
+
+    /* Youtube Vedio */
+    $(document).ready(function(){
+        keywords = "HIV/" + "world";
+        var doc = {};
+
+        suc_fun = function(doc){
+          entries = doc.getElementsByTagName('feed')[0].getElementsByTagName('entry');
+          var ul = document.createElement('ul');
+          ul.setAttribute('class', 'templatemo_list');
+          for(var i=0; i<= 3 && i<entries.length; i++){
+            title = entries[i].getElementsByTagName('title')[0].textContent;
+            url = entries[i].getElementsByTagName('content')[0].getAttribute('src');
+            time = entries[i].getElementsByTagName('published')[0].textContent;
+            time = time.substring(0, 10);
+            var p = document.createElement('li');
+            var a = document.createElement('a');
+            var pp = document.createElement('p');
+            a.href= url;
+            a.innerHTML = title;
+            a.target = '_blank';
+            pp.innerHTML = time;
+            p.appendChild(a);
+            p.appendChild(pp);
+            ul.appendChild(p);
+          }
+          $('#youtubeVideos_content').append(ul);    
+        };
+
+        fail_fun = function(ret){
+        };
+        
+        $.ajax({
+          url: "https://gdata.youtube.com/feeds/api/videos/-/" + keywords + "?v=2",
+          type: 'GET',
+          async: true
+        }).success(suc_fun).fail(fail_fun);
+    });
+
+    /* Wikipedia */
+    function wiki (){
+      var fullname;
+      if(countryCode == null){
+        fullname = "world"; 
+        var p = document.createElement('p');
+        var a = document.createElement('a');
+        a.href= "http://en.wikipedia.org/wiki/" + fullname;
+        a.innerHTML = "Wikipedia: World";
+        a.target = '_blank';
+        p.appendChild(a);
+        if($('#country_content')[0].getElementsByTagName('p').length != 0){
+            $('#country_content')[0].removeChild($('#country_content')[0].getElementsByTagName('p')[0]);
+        }
+
+        if($('#country_content')[0].getElementsByTagName('iframe').length != 0){
+            $('#country_content')[0].removeChild($('#country_content')[0].getElementsByTagName('iframe')[0]);
+        }
+
+        var iframe = document.createElement('iframe');
+        iframe.src = "http://en.m.wikipedia.org/wiki/" + fullname;
+        iframe.scrolling = "yes";
+        $('#country_content').append(iframe);
+        $('#country_content').append(p); 
+      }
+      else{
+        $.getJSON('http://127.0.0.1:3000/hivdatafetcher.json', function(data) {
+          var xx = data;
+          for(var i=0; i<data.length; i++){
+            if(data[i]["name"] == countryCode){
+              fullname = data[i]["displayname"];
+              var p = document.createElement('p');
+              var a = document.createElement('a');
+              a.href = "http://en.wikipedia.org/wiki/" + fullname;
+              a.innerHTML = "Wikipedia: " + fullname;
+              a.target = '_blank';
+              p.appendChild(a);
+              if($('#country_content')[0].getElementsByTagName('p').length != 0){
+                  $('#country_content')[0].removeChild($('#country_content')[0].getElementsByTagName('p')[0]);
+              }
+              if($('#country_content')[0].getElementsByTagName('iframe').length != 0){
+                  $('#country_content')[0].removeChild($('#country_content')[0].getElementsByTagName('iframe')[0]);
+              }
+
+              var iframe = document.createElement('iframe');
+              iframe.src = "http://en.m.wikipedia.org/wiki/" + fullname;
+              iframe.scrolling = "yes";
+              $('#country_content').append(iframe);
+              $('#country_content').append(p);
+              break;
+            }
+          }
+        });
+      }
+    }
+
+    function setCountryFunction(var2){
+      COUNTRYSELECTED = var2;
+      drawChart();
+    }
+
+    function setCountryFunction2(var3){
+      if(listOfSelectedCountries.length <= 10){
+        if(listOfSelectedCountries.length == 0){
+          listOfSelectedCountries.push(var3)
+          document.getElementById("selectedCountryDisplay").innerHTML += var3;
+        }
+        if($.inArray(var3, listOfSelectedCountries) == -1){
+          listOfSelectedCountries.push(var3)
+          document.getElementById("selectedCountryDisplay").innerHTML += "; ";
+          document.getElementById("selectedCountryDisplay").innerHTML += var3;
+        }
+      }
+      else{
+        alert("You cannot select more than 10 countries");
+      }
+    }
+
+    function multiSelectFunction(){
+      var jsonData = $.ajax ( {
+        url: "http://127.0.0.1:3000/hivdatafetcher.json?factor="+ FACTOR + "&country=US",
+        dataType: "json",
+        async: false 
+      }).responseText;
+      var data3 = new google.visualization.DataTable(jsonData);
+
+      data3.removeRows(0, data3.getNumberOfRows());
+
+      for (var j = 0; j < listOfSelectedCountries.length; j++)
+      { 
+        var jsonData = $.ajax ( {
+          url: "http://127.0.0.1:3000/hivdatafetcher.json?factor="+ FACTOR + "&country=" + listOfSelectedCountries[j],
+          dataType: "json",
+          async: false 
+        }).responseText;
+        var data_temp = new google.visualization.DataTable(jsonData);
+
+        for (var i = 0; i < data_temp.getNumberOfRows(); i++)
+        {
+          data3.addRow([data_temp.getValue(i, 0), data_temp.getValue(i, 1), data_temp.getValue(i, 2)]);
+        }
+      }
+
+      data3.insertColumn(0, 'string','id');
+      var max_bubble_val = data3.getColumnRange(2).max;
+      data3.insertColumn(4, 'number', 'size');
+      for (var i  = 0; i < data3.getNumberOfRows(); i++)
+        data3.setCell(i, 4, Math.sqrt(data3.getValue(i, 2)/max_bubble_val));
+
+      var options = {
+        title: 'Comparison Among Selected Countries',
+        width: 600,
+        height: 400
+      };
+
+      var Bubblechart = new google.visualization.BubbleChart(document.getElementById('vis_compare'));
+      Bubblechart.draw(data3, options);
+    }
+
+    function deleteAllFunction(){
+      listOfSelectedCountries = [];
+      document.getElementById("selectedCountryDisplay").innerHTML = "";
+    }
+
+    function myFunction3(var3){
+      FACTOR = var3.toLowerCase();
+    }
+</script>
+
+
+<div id="templatemo_wrapper">
+    
+    <div id="templatemo_map">
+
+      <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1">Wolrd Map</a></li>
+            <li><a href="#tabs-2">Country Info</a></li>
+            <li><a href="#tabs-3">Comparison</a></li>
+            <li><a href="#tabs-0">Favorite</a></li>
+        </ul>
+        
+        <div id="tabs-0">
+          <div id="vis_fav_country" style="width: 700px; height: 360px;"></div>
+        </div>
+        <div id="tabs-1">
+            <div id="visualization" style="width: 600px; height: 400px;"></div>
+            <div id="feedback">
+              <ol id="selectable">
+                <li class="ui-widget-content"><button onclick="myFunction('Hiv')" style="background-color:#FF7070;">HIV Prevalence</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('HealthExpenditure')" style="background-color:#45FF1E;">Health Expenditure</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('GDP')" style="background-color:#00F4E5;">Gross Domestic Price</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('ImprovedWaterSource')" style="background-color:#FEFF70;">Improved Water Source</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('RuralPopulation')" style="background-color:#FF28B8;">Rural Population</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('ImprovedSanitationFacilities')" style="background-color:#B53DFF;">Improved Sanitation</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('LiteracyRate')" style="background-color:#FFD851;">Literacy Rate</button></li>
+                <li class="ui-widget-content"><button onclick="myFunction('UnemploymentRate')" style="background-color:#698CF6;">Unemployment Rate</button></li>
+              </ol>
+            </div>
+            <div id="scrollyear">   
+              <div id="slider-vertical" style="height: 270px;">
+                <p style="margin-top: -60px;">
+                  <label for="amount">Year:</label>
+                  <input type="text" id="amount" style="border: 0; color: #f6931f; font-weight: bold; width: 50px;" />
+                  
+                </p>
+              </div> 
+            </div>
+            <div id="displayInfo"> This is a global data visualization of <p id="demo"></p></div>      
+        </div>
+        
+        <div id="tabs-2">
+            <div id="countryselection">
+            <select id="countryAlphaCode" onClick="setCountryFunction(value);">
+              <%= render "dropdownelement" %>
+            </select>
+          </div>
+          <div id="vis_country" style="width: 700px; height: 360px;"></div>
+        </div>
+        <div id="tabs-3">
+          <div id="vis_compare" style="width: 600px; height: 400px;"></div>
+          <div id="countrymultiselection">
+            <p id="selectedCountryDisplay">Selected:</p>
+            <select SIZE=6 onClick="setCountryFunction2(value);"> 
+              <%= render "dropdownelement" %>
+            </select>
+            <button id = "compareButton" onclick="multiSelectFunction()" style="background-color:#56c5eb;">Compare Countries</button>
+            <button id = "deleteButton" onclick="deleteAllFunction()" style="background-color:#56c5eb;">Delete Countries</button>
+            <div id="buttongroup">
+              <button onclick="myFunction3('Hiv')" style="background-color:#FF7070;">HIV Prevalence</button>
+              <button onclick="myFunction3('HealthExpenditure')" style="background-color:#45FF1E;">Health Expenditure</button>
+              <button onclick="myFunction3('GDP')" style="background-color:#00F4E5;">Gross Domestic Price</button>
+              <button onclick="myFunction3('ImprovedWaterSource')" style="background-color:#FEFF70;">Improved Water Source</button>
+              <button onclick="myFunction3('RuralPopulation')" style="background-color:#FF28B8;">Rural Population</button>
+              <button onclick="myFunction3('ImprovedSanitationFacilities')" style="background-color:#B53DFF;">Improved Sanitation</button>
+              <button onclick="myFunction3('LiteracyRate')" style="background-color:#FFD851;">Literacy Rate</button>
+              <button onclick="myFunction3('UnemploymentRate')" style="background-color:#698CF6;">Unemployment Rate</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    <div id="templatemo_main">
+    
+      <div id="googleNews" class="three_column margin_r35 vertical_divider">
+          <h2>Google News</h2>
+          <div id="googleNews_content"> </div>
+          <div class="button float_r"><a href="http://goo.gl/SoMlf" target="_blank">More News...</a></div>          
+        </div>
+      <div class="three_column margin_r35 vertical_divider">
+          <h2> YouTube Video</h2>
+          <ul class="templatemo_list">
+          </ul>
+            
+          <div id="youtubeVideos_content"> </div>
+
+          <div class="button float_r"><a href="http://goo.gl/XFQZw" target="_blank">More Videos...</a></div>
+
+        </div>
+         <div class="three_column">
+          <h2>About The Country</h2>
+          <div id="country_content" ></div>
+        </div>
+        
+        <div class="cleaner"></div>
+        
+    </div>
+</div> 

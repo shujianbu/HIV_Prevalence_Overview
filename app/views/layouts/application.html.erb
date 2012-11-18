@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HIV World Prevalence</title>
+    <%= stylesheet_link_tag 'main_style.css' %>
+    <%= stylesheet_link_tag 'jquery-ui.css' %>
+    <script src="http://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="http://code.jquery.com/ui/1.9.1/jquery-ui.js"></script>
+  </head>
+
+  <body>
+    <div id="templatemo_wrapper">
+    	<div id="templatemo_header">
+        <div id="templatemo_menu">
+          <ul>
+            <li><%= link_to "Home", root_path %></li>
+            <li><%= link_to "Data", data_page_path %></li>
+            <li><%= link_to "Stories", stories_page_path %></li>
+            <li><%= link_to "Contact", contact_page_path %></li>
+            <div id="user_nav">
+        			<% if user_signed_in? %>
+        				<% if current_user.priority == "low" %>
+        					<li><%= link_to "Update Account", edit_user_registration_path, :method => :delete %></li>
+            				<li><%= link_to "Log out", destroy_user_session_path, :method => :delete %></li>
+            			<% else %>
+            				<li><%= link_to "Update Account", edit_user_registration_path, :method => :delete %></li>
+            				<li><%=link_to "Manage User", manage_user_path %></li>
+            				<li><%= link_to "Log out", destroy_user_session_path, :method => :delete %></li>
+            			<% end %>
+        			<% else %>
+            			<li><%= link_to 'Sign Up', new_user_registration_path %></li>
+            			<li><%= link_to 'Sign in', new_user_session_path %></li>
+    				  <% end %>
+            </div>
+          </ul>    	    
+        </div> 
+            
+        <div id="site_title">
+          <h1><a href="index.html" target="_parent">Global <strong>HIV</strong><span>Prevalence Overview</span></a></h1>            
+        </div>
+      </div>
+    </div> 
+
+    <%= yield %>
+
+    <div id="templatemo_wrapper">
+    	<div id="templatemo_footer">
+           
+    		<script charset="utf-8" src="http://widgets.twimg.com/j/2/widget.js"></script>
+    		<script>
+    			new TWTR.Widget({
+    				version: 2,type: 'search',search: '#HIV',interval: 3000,title: '',subject: '#HIV',width: 900, height: 200,
+    				theme: {shell: {background: '#1d1400',color: '#ffffff'},tweets: {background: '#c5bba4',color: '#f9f8f5',links: '#1d1400'}},
+    				features: { scrollbar: false, loop: true, live: true, behavior: 'default'}}).render().start();
+    		</script>
+                
+    		Copyright © 2012 | Network Fetcher | <a href= "http://score-contest.org/2013/"> Student Contest on Software Engineering </a>    
+    	</div>
+    </div>
+  </body>
+</html>

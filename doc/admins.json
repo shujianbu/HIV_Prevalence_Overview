@@ -1,0 +1,34 @@
+[
+  {
+    "username":"puconghan",
+    "email": "ph2369@columbia.edu",
+    "encrypted_password":"$2a$10$Hf3GUgF/KRmp1Sh/aGwkg.kgaZXP1FeXBpc/kOIKHLpiY.17vwvUG",
+    "priority":"high",
+    "basedcountry":"Moon",
+    "sign_in_count" : 1
+  },
+  {
+    "username":"shujianbu",
+    "email": "sb3331@columbia.edu",
+    "encrypted_password":"$2a$10$Hf3GUgF/KRmp1Sh/aGwkg.kgaZXP1FeXBpc/kOIKHLpiY.17vwvUG",
+    "priority":"high",
+    "basedcountry":"Moon",
+    "sign_in_count" : 1
+  },
+  {
+    "username":"taocheng",
+    "email": "tc2569@columbia.edu",
+    "encrypted_password":"$2a$10$Hf3GUgF/KRmp1Sh/aGwkg.kgaZXP1FeXBpc/kOIKHLpiY.17vwvUG",
+    "priority":"high",
+    "basedcountry":"Moon",
+    "sign_in_count" : 1
+  },
+  {
+    "username":"nanzhuwang",
+    "email": "nw2260@columbia.edu",
+    "encrypted_password":"$2a$10$Hf3GUgF/KRmp1Sh/aGwkg.kgaZXP1FeXBpc/kOIKHLpiY.17vwvUG",
+    "priority":"high",
+    "basedcountry":"Moon",
+    "sign_in_count" : 1
+  }
+]
