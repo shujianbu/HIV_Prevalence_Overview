@@ -2,14 +2,7 @@ COMS 4156 Advanced Software Engineering
 Team 1 - Network Fetcher 
 Project - HIV Prevalence Overview
 
-I Contact
-
-Tao Cheng tc2569@columbia.edu
-Pucong Han ph2369@columbia.edu
-Shujian Bu sb3331@columbia.edu
-Nanzhu Wang nw2260@columbia.edu
-
-II Introduction
+I Introduction
 
 This is a N-tier web application based on Ruby on Rails that serves 
 to visualize the HIV prevalence and its coorelated factors. The 
@@ -22,7 +15,7 @@ interacting with this application will be informed of the current
 situations and trends of the global Hiv infection as well as impacts 
 of related indicators.
 
-III System Requirements
+II System Requirements
 
 *  Supported Operating Systems: GNU/Linux, Microsoft Windows 7 64-
 bit, Macintosh OS 64-bit
@@ -32,7 +25,7 @@ bit, Macintosh OS 64-bit
 make sure Javascript is enabled) NOTE: IE may not be supported
 currently
 
-IV Deployment for Testing Puropose
+III Deployment for Testing Puropose
 
 *  Please ensure that 
      Ruby,
@@ -56,7 +49,7 @@ IV Deployment for Testing Puropose
 *  For testing a user account, please login with username: "test2" 
 and password: "testtest"
 
-V Rails Components Being Used
+IV Rails Components Being Used
 
 *  mongoid
 *  bson_ext
@@ -83,7 +76,7 @@ V Rails Components Being Used
 *  orm_adapter
 *  warden
 
-VI Javascript Libraries / APIs Used
+V Javascript Libraries / APIs Used
 
 *  jquery
 *  google javascript
@@ -92,7 +85,7 @@ VI Javascript Libraries / APIs Used
 *  youtube api
 *  twitter api
 
-VII Misc
+VI Misc
 
 *  JIRA is used for project management. 
 *  STASH and GitHub is used as code repository. 
@@ -101,8 +94,8 @@ data source. It is possible that some countries may lack data
 in certain years, rendering that there may be blank areas or
 zero data points in our visualization charts.
 
-VIII Bug Report 
+VII Bug Report 
 
 Bug and missing feature patches are certainly welcome. Please 
-email hivdatafetcher@gmail.com if you have any questions or 
+email me if you have any questions or 
 comments. 
